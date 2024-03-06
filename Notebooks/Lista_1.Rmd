@@ -1,0 +1,125 @@
+---
+title: "MI628 - Lista 1"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Pacotes e Funções
+
+```{r utils, warning=FALSE}
+# PACOTES
+library(Matching)
+library(tidyverse)
+
+# FUNCOES
+# Função que ajusta modelos para todas as combinações de preditoras
+# possíveis
+ajuste.subconjuntos <- function(df) {
+  
+  colunas <- colnames(lalonde)[colnames(lalonde) != c("re78", "treat")]
+  
+  combin <- expand.grid(v1 = c(T,F), v2 = c(T,F), v3 = c(T,F), v4 = c(T,F),
+                      v5 = c(T,F), v6 = c(T,F), v7 = c(T,F), v8 = c(T,F),
+                      v9 = c(T,F), v10 = c(T,F))
+  colnames(combin) <- colunas
+  l <- unlist(apply(combin, 1, list), recursive = FALSE)
+  subconjuntos <- lapply(l, function(x) names(x)[x])
+  
+  ajustes <- list()
+  
+  for (ajuste in seq_len(length(subconjuntos))) {
+    
+    dados <- df %>% 
+      select(re78, treat, subconjuntos[[ajuste]]) %>% 
+      na.omit()
+    
+    if (length(dados) == 2) {
+      
+      fit <- formula(paste0("re78 ~ factor(treat)"))
+      
+    } else {
+      
+      fit <- formula(paste0("re78 ~ factor(treat) + ", 
+                          paste(subconjuntos[[ajuste]], collapse = " + ")))
+      
+    }
+    
+    modelo <- lm(formula = fit, data = dados)
+    
+    ajustes[[ajuste]] <- modelo
+    
+  }
+
+  return(ajustes)
+  
+}
+
+# Função para extrair todos os betas da lista de ajustes
+extraindo.betas <- function(ajustes) {
+  
+  betas <- c()
+  
+  for (ajuste in seq_len(length(ajustes))) {
+    
+    beta <- ajustes[[ajuste]]$coefficients[2]
+    
+    betas <- c(betas, beta)
+    
+  }
+  
+  return(betas)
+  
+}
+
+# Função para extrair todos os p-valores da lista de ajustes
+extraindo.pvalor <- function(ajustes) {
+  
+  pvalores <- c()
+  
+  for (ajuste in seq_len(length(ajustes))) {
+    
+    pvalor <- summary(ajustes[[ajuste]])$coefficients[, 4][2]
+    
+    pvalores <- c(pvalores, pvalor)
+    
+  }
+  
+  return(pvalores)
+  
+}
+```
+
+# Questão 3
+
+```{r base}
+# Carregando base
+data(lalonde)
+
+# Transformando variável treat em dummy
+lalonde <- lalonde %>% 
+  mutate(treat = factor(treat))
+```
+
+```{r ajustes}
+# Ajustando 1024 regressões
+ajustes <- ajuste.subconjuntos(lalonde)
+
+# Extraindo os estimadores para treat
+betas <- extraindo.betas(ajustes)
+
+# Extraindo p-valores dos estimadores
+pvalores <- extraindo.pvalor(ajustes)
+
+# Salvando resultados
+resultados <- tibble(betas, pvalores) %>% 
+  mutate(pos_sig = ifelse(betas > 0 & pvalores < 0.05, 1, 0),
+         neg_sig = ifelse(betas < 0 & pvalores < 0.05, 1, 0),
+         sig = ifelse(pvalores >= 0.05, 1, 0))
+```
+
+a) Quantidade de vezes em que o tratamento foi positivo e significativo: `r sum(resultados$pos_sig)`
+b) Quantidade de vezes em que o tratamento foi negativo e significativo: `r sum(resultados$neg_sig)`
+c) Quantidade de vezes em que o tratamento não foi significativo: `r sum(resultados$sig)`
