@@ -123,3 +123,38 @@ resultados <- tibble(betas, pvalores) %>%
 a) Quantidade de vezes em que o tratamento foi positivo e significativo: `r sum(resultados$pos_sig)`
 b) Quantidade de vezes em que o tratamento foi negativo e significativo: `r sum(resultados$neg_sig)`
 c) Quantidade de vezes em que o tratamento não foi significativo: `r sum(resultados$sig)`
+
+# Questão 4a
+
+```{r esperanca}
+E_rho_pos <- -0.5 - 2 * ((-dnorm(0.5))/(1 - pnorm(0.5, lower.tail = T)))
+
+E_rho_neg <- - 1 * (dnorm(0.5)/(pnorm(0.5)))
+
+E_diff <- E_rho_pos - E_rho_neg
+
+E_diff
+```
+# Questão 4b
+
+```{r sim1}
+Y0 <- rnorm(1)
+tau <- -0.5 + Y0
+Y1 <- Y0 + tau
+Z <- ifelse(tau < 0, 0, 1)
+Y <- Z * Y1 + (1-Z) * Y0
+
+Y
+```
+
+```{r sim2}
+Y0 <- rnorm(1000000)
+tau <- -0.5 + Y0
+Y1 <- Y0 + tau
+Z <- ifelse(tau < 0, 0, 1)
+Y <- Z * Y1 + (1-Z) * Y0
+
+mean(Y[Z==1])
+mean(Y[Z==0])
+mean(Y[Z==1]) - mean(Y[Z==0])
+```
