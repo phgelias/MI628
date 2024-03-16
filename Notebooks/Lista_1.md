@@ -61,11 +61,11 @@ ajuste.subconjuntos <- function(df) {
     
     if (length(dados) == 2) {
       
-      fit <- formula(paste0("re78 ~ factor(treat)"))
+      fit <- formula(paste0("re78 ~ treat"))
       
     } else {
       
-      fit <- formula(paste0("re78 ~ factor(treat) + ", 
+      fit <- formula(paste0("re78 ~ treat + ", 
                           paste(subconjuntos[[ajuste]], collapse = " + ")))
       
     }
@@ -104,7 +104,7 @@ extraindo.pvalor <- function(ajustes) {
   
   for (ajuste in seq_len(length(ajustes))) {
     
-    pvalor <- summary(ajustes[[ajuste]])$coefficients[, 4][2]
+    pvalor <- summary(ajustes[[ajuste]])$coefficients[2, 3]
     
     pvalores <- c(pvalores, pvalor)
     
@@ -138,13 +138,95 @@ pvalores <- extraindo.pvalor(ajustes)
 
 # Salvando resultados
 resultados <- tibble(betas, pvalores) %>% 
-  mutate(pos_sig = ifelse(betas > 0 & pvalores < 0.05, 1, 0),
-         neg_sig = ifelse(betas < 0 & pvalores < 0.05, 1, 0),
-         sig = ifelse(pvalores >= 0.05, 1, 0))
+  mutate(pos_sig = ifelse(betas > 0 & pvalores > 2.807034, 1, 0),
+         neg_sig = ifelse(betas < 0 & pvalores > 2.807034, 1, 0),
+         sig = ifelse(pvalores <= 2.807034, 1, 0))
 ```
 
 1)  Quantidade de vezes em que o tratamento foi positivo e
-    significativo: 1024
+    significativo: 106
 2)  Quantidade de vezes em que o tratamento foi negativo e
     significativo: 0
-3)  Quantidade de vezes em que o tratamento não foi significativo: 0
+3)  Quantidade de vezes em que o tratamento não foi significativo: 918
+
+``` r
+library(car)
+```
+
+    ## Carregando pacotes exigidos: carData
+
+    ## 
+    ## Attaching package: 'car'
+
+    ## The following object is masked from 'package:dplyr':
+    ## 
+    ##     recode
+
+    ## The following object is masked from 'package:purrr':
+    ## 
+    ##     some
+
+``` r
+library(purrr)
+
+se_EHW <- map(ajustes, function(x) sqrt(hccm(x, type = "hc0")[2, 2]))
+Z <- map2(.x = ajustes, .y = se_EHW, .f = function(x, y) x$coefficients[2]/y)
+
+
+n_signficativos <- as.numeric(unlist(map(Z, function(x) ifelse(x > 2.807034, 1, 0))))
+sum(n_signficativos)
+```
+
+    ## [1] 1
+
+# Questão 4a
+
+``` r
+E_rho_pos <- -0.5 - 2 * ((-dnorm(0.5))/(1 - pnorm(0.5, lower.tail = T)))
+
+E_rho_neg <- - 1 * (dnorm(0.5)/(pnorm(0.5)))
+
+E_diff <- E_rho_pos - E_rho_neg
+
+E_diff
+```
+
+    ## [1] 2.291316
+
+# Questão 4b
+
+``` r
+Y0 <- rnorm(1)
+tau <- -0.5 + Y0
+Y1 <- Y0 + tau
+Z <- ifelse(tau < 0, 0, 1)
+Y <- Z * Y1 + (1-Z) * Y0
+
+Y
+```
+
+    ## [1] -0.5604756
+
+``` r
+Y0 <- rnorm(1000000)
+tau <- -0.5 + Y0
+Y1 <- Y0 + tau
+Z <- ifelse(tau < 0, 0, 1)
+Y <- Z * Y1 + (1-Z) * Y0
+
+mean(Y[Z==1])
+```
+
+    ## [1] 1.780949
+
+``` r
+mean(Y[Z==0])
+```
+
+    ## [1] -0.5096613
+
+``` r
+mean(Y[Z==1]) - mean(Y[Z==0])
+```
+
+    ## [1] 2.29061
