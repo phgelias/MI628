@@ -39,11 +39,11 @@ ajuste.subconjuntos <- function(df) {
     
     if (length(dados) == 2) {
       
-      fit <- formula(paste0("re78 ~ factor(treat)"))
+      fit <- formula(paste0("re78 ~ treat"))
       
     } else {
       
-      fit <- formula(paste0("re78 ~ factor(treat) + ", 
+      fit <- formula(paste0("re78 ~ treat + ", 
                           paste(subconjuntos[[ajuste]], collapse = " + ")))
       
     }
@@ -82,7 +82,7 @@ extraindo.pvalor <- function(ajustes) {
   
   for (ajuste in seq_len(length(ajustes))) {
     
-    pvalor <- summary(ajustes[[ajuste]])$coefficients[, 4][2]
+    pvalor <- summary(ajustes[[ajuste]])$coefficients[2, 3]
     
     pvalores <- c(pvalores, pvalor)
     
@@ -116,14 +116,27 @@ pvalores <- extraindo.pvalor(ajustes)
 
 # Salvando resultados
 resultados <- tibble(betas, pvalores) %>% 
-  mutate(pos_sig = ifelse(betas > 0 & pvalores < 0.05, 1, 0),
-         neg_sig = ifelse(betas < 0 & pvalores < 0.05, 1, 0),
-         sig = ifelse(pvalores >= 0.05, 1, 0))
+  mutate(pos_sig = ifelse(betas > 0 & pvalores > 2.807034, 1, 0),
+         neg_sig = ifelse(betas < 0 & pvalores > 2.807034, 1, 0),
+         sig = ifelse(pvalores <= 2.807034, 1, 0))
 ```
 
 a) Quantidade de vezes em que o tratamento foi positivo e significativo: `r sum(resultados$pos_sig)`
 b) Quantidade de vezes em que o tratamento foi negativo e significativo: `r sum(resultados$neg_sig)`
 c) Quantidade de vezes em que o tratamento não foi significativo: `r sum(resultados$sig)`
+
+```{r ajustes_correcao}
+library(car)
+library(purrr)
+
+se_EHW <- map(ajustes, function(x) sqrt(hccm(x, type = "hc0")[2, 2]))
+Z <- map2(.x = ajustes, .y = se_EHW, .f = function(x, y) x$coefficients[2]/y)
+
+
+n_signficativos <- as.numeric(unlist(map(Z, function(x) ifelse(x > 2.807034, 1, 0))))
+sum(n_signficativos)
+```
+
 
 # Questão 4a
 
@@ -136,6 +149,7 @@ E_diff <- E_rho_pos - E_rho_neg
 
 E_diff
 ```
+
 # Questão 4b
 
 ```{r sim1}
