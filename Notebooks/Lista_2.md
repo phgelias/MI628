@@ -1,27 +1,66 @@
----
-title: "MI628 - Lista 2"
-output: github_document
----
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-set.seed(123)
-```
+MI628 - Lista 2
+================
 
 # Pacotes e Funções
 
-```{r utils, warning=FALSE}
+``` r
 # PACOTES
 library(Matching)
+```
+
+    ## Carregando pacotes exigidos: MASS
+
+    ## ## 
+    ## ##  Matching (Version 4.10-14, Build Date: 2023-09-13)
+    ## ##  See https://www.jsekhon.com for additional documentation.
+    ## ##  Please cite software as:
+    ## ##   Jasjeet S. Sekhon. 2011. ``Multivariate and Propensity Score Matching
+    ## ##   Software with Automated Balance Optimization: The Matching package for R.''
+    ## ##   Journal of Statistical Software, 42(7): 1-52. 
+    ## ##
+
+``` r
 library(tidyverse)
+```
+
+    ## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+    ## ✔ dplyr     1.1.4     ✔ readr     2.1.5
+    ## ✔ forcats   1.0.0     ✔ stringr   1.5.1
+    ## ✔ ggplot2   3.5.0     ✔ tibble    3.2.1
+    ## ✔ lubridate 1.9.3     ✔ tidyr     1.3.1
+    ## ✔ purrr     1.0.2
+
+    ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+    ## ✖ dplyr::filter() masks stats::filter()
+    ## ✖ dplyr::lag()    masks stats::lag()
+    ## ✖ dplyr::select() masks MASS::select()
+    ## ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+
+``` r
 library(data.table)
 ```
+
+    ## 
+    ## Attaching package: 'data.table'
+    ## 
+    ## The following objects are masked from 'package:lubridate':
+    ## 
+    ##     hour, isoweek, mday, minute, month, quarter, second, wday, week,
+    ##     yday, year
+    ## 
+    ## The following objects are masked from 'package:dplyr':
+    ## 
+    ##     between, first, last
+    ## 
+    ## The following object is masked from 'package:purrr':
+    ## 
+    ##     transpose
 
 # Questão 3
 
 ## Implementação FRT da aula
 
-```{r sala}
+``` r
 data(lalonde)
 z <- lalonde$treat
 y <- lalonde$re78
@@ -57,12 +96,11 @@ for (i in 1:mc) {
   est_test_frt_classico_t_mc[i] <- t.test(y[z_permut == 1], y[z_permut == 0], var.equal = TRUE)$statistic
 }
 pvalor_frt_classico_t_mc <- mean(abs(est_test_frt_classico_t_mc) > abs(est_test_frt_classico_t))
-
 ```
 
 ## Implementação FRT Estatística *t*-studentizada
 
-```{r t-studentizada}
+``` r
 FRT.t.studentizada <- function(DT, Y, Z) {
   
   y <- DT[[Y]]
@@ -89,7 +127,7 @@ pvalor_frt_t_studentizada <- FRT.t.studentizada(lalonde, "re78", "treat")
 
 ## Implementação FRT Estatística de Wilcox
 
-```{r wilcox}
+``` r
 FRT.wilcox <- function(DT, Y, Z) {
   
   y <- DT[[Y]]
@@ -119,7 +157,7 @@ pvalor_frt_wilcox <- FRT.wilcox(lalonde, "re78", "treat")
 
 ## Resultados
 
-```{r comparacaoes}
+``` r
 c("FRT CLT" = pvalor_frt_clt,
   "FRT MC" = pvalor_frt_mc,
   "FRT Estatística t" = pvalor_frt_classico_t,
@@ -128,25 +166,50 @@ c("FRT CLT" = pvalor_frt_clt,
   "FRT Estatística Wilcox" = pvalor_frt_wilcox)
 ```
 
-O *p-valor* do FRT utilizando a estatística *t*-studentizada, apesar de estar próximo dos demais, é mais conservador quanto a heterocedasticidade entre o grupo de tratamento e controle. 
+    ##                        FRT CLT                         FRT MC 
+    ##                    0.004906490                    0.004240000 
+    ##              FRT Estatística t           FRT Estatística t MC 
+    ##                    0.004787524                    0.004410000 
+    ## FRT Estatística t studentizada         FRT Estatística Wilcox 
+    ##                    0.007491987                    0.012163129
 
-No *boxplot* de *re78 ~ treat*, é possível notar a diferença que distribuição do grupo tratamento é mais assimétrica à direita do que o grupo controle.
+O *p-valor* do FRT utilizando a estatística *t*-studentizada, apesar de
+estar próximo dos demais, é mais conservador quanto a
+heterocedasticidade entre o grupo de tratamento e controle.
 
-```{r boxplots_grupos, fig.cap="Boxplot de re78 ~ treat"}
+No *boxplot* de *re78 ~ treat*, é possível notar a diferença que
+distribuição do grupo tratamento é mais assimétrica à direita do que o
+grupo controle.
+
+``` r
 boxplot(re78 ~ treat, data = lalonde)
 ```
 
-Enquanto o *p-valor* do FRT utilizando a estatística Wilcox é mais conservador quanto à presença de *outliers*, os quais estão presentes na distribuição *re78*, destacados no *boxplot*.
+<figure>
+<img src="Lista_2_files/figure-gfm/boxplots_grupos-1.png"
+alt="Boxplot de re78 ~ treat" />
+<figcaption aria-hidden="true">Boxplot de re78 ~ treat</figcaption>
+</figure>
 
-```{r boxplots_re78, fig.cap="Boxplot de re78 ~ treat"}
+Enquanto o *p-valor* do FRT utilizando a estatística Wilcox é mais
+conservador quanto à presença de *outliers*, os quais estão presentes na
+distribuição *re78*, destacados no *boxplot*.
+
+``` r
 boxplot(lalonde$re78)
 ```
+
+<figure>
+<img src="Lista_2_files/figure-gfm/boxplots_re78-1.png"
+alt="Boxplot de re78 ~ treat" />
+<figcaption aria-hidden="true">Boxplot de re78 ~ treat</figcaption>
+</figure>
 
 # Questão 4
 
 ## *p-valor* exato
 
-```{r simulacao}
+``` r
 # Tempo de início
 time_init <- Sys.time()
 
@@ -210,9 +273,11 @@ time_final <- Sys.time()
 time_final - time_init
 ```
 
+    ## Time difference of 29.13742 mins
+
 ## *p-valores* aproximados para $R = 10^2, 10^3, 10^4$
 
-```{r amostras_R}
+``` r
 R_valores <- c(10^2, 10^3, 10^4)
 
 p_R_lista <- list()
@@ -262,17 +327,30 @@ for (R in R_valores) {
 
 # R = 10^2
 p_R_lista[[1]]
+```
 
+    ##          p      p_hat      p_til 
+    ## 0.02415077 0.01000000 0.00990099
+
+``` r
 # R = 10^3
 p_R_lista[[2]]
+```
 
+    ##          p      p_hat      p_til 
+    ## 0.02415077 0.01900000 0.01898102
+
+``` r
 # R = 10^4
 p_R_lista[[3]]
 ```
 
+    ##          p      p_hat      p_til 
+    ## 0.02415077 0.02570000 0.02569743
+
 # Questão 6b
 
-```{r ilustracao}
+``` r
 # Tabela Científica (CRE)
 n <- 100
 n1 <- 60
@@ -308,22 +386,37 @@ for (i in 1:10^4) {
 c("var_hat_tau" = var_hat_tau,
   "V_til" = V_til,
   "V_til_MC" = mean(V_til_p))
+```
 
+    ## var_hat_tau       V_til    V_til_MC 
+    ##  0.04603892  0.04053786  0.04545174
+
+``` r
 # Cobertura do valor real nos intervalos
 cobertura <- c()
 for (i in 1:10^4) {
   cobertura[i] <- ifelse(lim_inf[i] < tau && tau < lim_sup[i], 1, 0)
 }
 mean(cobertura)
+```
 
+    ## [1] 0.9454
+
+``` r
 hist(est)
 ```
 
-```{r caso1}
+![](Lista_2_files/figure-gfm/ilustracao-1.png)<!-- -->
+
+``` r
 y0 <- sort(y0, decreasing = FALSE)
 var_hat_tau <- var(y1) / n1 + var(y0) / n0 - var(y1 - y0) / n
 var_hat_tau
+```
 
+    ## [1] 0.00977355
+
+``` r
 tau_hat_p <- c()
 V_til_p <- c()
 lim_sup <- c()
@@ -339,15 +432,25 @@ for (i in 1:10^4) {
   est[i] <- (tau_hat_p[i] - tau) / sqrt(V_til_p[i])
 }
 c(mean(V_til_p), mean(cobertura))
+```
 
+    ## [1] 0.04563589 1.00000000
+
+``` r
 hist(est)
 ```
 
-```{r caso2}
+![](Lista_2_files/figure-gfm/caso1-1.png)<!-- -->
+
+``` r
 y0 <- sample(y0)
 var_hat_tau <- var(y1) / n1 + var(y0) / n0 - var(y1 - y0) / n
 var_hat_tau
+```
 
+    ## [1] 0.0255929
+
+``` r
 tau_hat_p <- c()
 V_til_p <- c()
 lim_sup <- c()
@@ -363,11 +466,17 @@ for (i in 1:10^4) {
   est[i] <- (tau_hat_p[i] - tau) / sqrt(V_til_p[i])
 }
 c(mean(V_til_p), mean(cobertura))
+```
 
+    ## [1] 0.04590446 0.98710000
+
+``` r
 hist(est)
 ```
 
-```{r caso3}
+![](Lista_2_files/figure-gfm/caso2-1.png)<!-- -->
+
+``` r
 set.seed(123)
 eps <- rbinom(n, 1, 0.4)
 y0 <- (1 - eps) * rexp(n) + eps*rcauchy(n)
@@ -391,6 +500,12 @@ for (i in 1:10^4) {
 }
 
 c(mean(V_til_p), mean(cobertura))
+```
 
+    ## [1] 0.7914444 0.9970000
+
+``` r
 hist(est)
 ```
+
+![](Lista_2_files/figure-gfm/caso3-1.png)<!-- -->
