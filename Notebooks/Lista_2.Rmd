@@ -103,8 +103,10 @@ FRT.wilcox <- function(DT, Y, Z) {
   
   W <- sum(z * posto_y)
   
+  NTIES <- table(posto_y)
+  
   E_W <- n1 * (n + 1)/2
-  S_W <- sqrt(n1 * n0 * (n + 1) * 1/12)
+  S_W <- sqrt(n1 * n0 * 1/12 * ((n + 1) - sum(NTIES^3 - NTIES)/((n) * (n - 1))))
   
   W_FRT <- (W - E_W)/S_W
   
