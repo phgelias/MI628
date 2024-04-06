@@ -61,9 +61,10 @@ library(data.table)
 ## Implementação FRT da aula
 
 ``` r
+# Conjunto de dados
 data(lalonde)
-z <- lalonde$treat
-y <- lalonde$re78
+z <- lalonde$treat # Tratamento
+y <- lalonde$re78 # Resposta
 
 n <- nrow(lalonde)
 n1 <- sum(z)
@@ -86,22 +87,30 @@ for (i in 1:mc) {
 pvalor_frt_mc <- mean(abs(est_teste_frt_mc) > abs(est_teste_frt))
 
 # FRT clássico teste t para dif medias 
-est_test_frt_classico_t <- t.test(y[z == 1], y[z == 0], var.equal = TRUE)$statistic
-pvalor_frt_classico_t <- t.test(y[z == 1], y[z == 0], var.equal = TRUE)$p.value
+est_test_frt_classico_t <- t.test(y[z == 1], 
+                                  y[z == 0], var.equal = TRUE)$statistic
+pvalor_frt_classico_t <- t.test(y[z == 1], 
+                                y[z == 0], var.equal = TRUE)$p.value
 
 # FRT MC via clássico teste t para dif medias 
 est_test_frt_classico_t_mc <- rep(0, mc)
+
 for (i in 1:mc) {
   z_permut <- sample(z)
-  est_test_frt_classico_t_mc[i] <- t.test(y[z_permut == 1], y[z_permut == 0], var.equal = TRUE)$statistic
+  est_test_frt_classico_t_mc[i] <- t.test(y[z_permut == 1], 
+                                          y[z_permut == 0], 
+                                          var.equal = TRUE)$statistic
 }
-pvalor_frt_classico_t_mc <- mean(abs(est_test_frt_classico_t_mc) > abs(est_test_frt_classico_t))
+
+pvalor_frt_classico_t_mc <- mean(
+  abs(est_test_frt_classico_t_mc) > abs(est_test_frt_classico_t
+                                        ))
 ```
 
 ## Implementação FRT Estatística *t*-studentizada
 
 ``` r
-FRT.t.studentizada <- function(DT, Y, Z) {
+FRT.t.studentizada <- function(DT, Y, Z, mc = 10^5) {
   
   y <- DT[[Y]]
   z <- DT[[Z]]
@@ -114,11 +123,20 @@ FRT.t.studentizada <- function(DT, Y, Z) {
   s2_1 <- var(y[z == 1])
   s2_0 <- var(y[z == 0])
   
-  t_FRT <- tau/(sqrt(s2_1/n1 + s2_0/n0))
+  est_teste_frt <- tau/(sqrt(s2_1/n1 + s2_0/n0))
+
+  est_teste_frt_mc <- rep(0, mc)
+  for (i in 1:mc) {
+    zpermut <- sample(z)
+    tau_permut <- mean(y[zpermut == 1]) - mean(y[zpermut == 0])
+    s2_1_permut <- var(y[zpermut == 1])
+    s2_0_permut <- var(y[zpermut == 0])
+    est_teste_frt_mc[i] <- tau_permut/(sqrt(s2_1_permut/n1 + s2_0_permut/n0))
+  }
   
-  pvalor <- 2 - 2 * pnorm(t_FRT)
+  pvalor_frt_mc <- mean(abs(est_teste_frt_mc) > abs(est_teste_frt))
   
-  return(pvalor)
+  return(pvalor_frt_mc)
   
 }
 
@@ -128,7 +146,7 @@ pvalor_frt_t_studentizada <- FRT.t.studentizada(lalonde, "re78", "treat")
 ## Implementação FRT Estatística de Wilcox
 
 ``` r
-FRT.wilcox <- function(DT, Y, Z) {
+FRT.wilcox <- function(DT, Y, Z, mc = 10^5) {
   
   y <- DT[[Y]]
   z <- DT[[Z]]
@@ -141,14 +159,26 @@ FRT.wilcox <- function(DT, Y, Z) {
   
   W <- sum(z * posto_y)
   
+  NTIES <- table(posto_y)
+  
   E_W <- n1 * (n + 1)/2
-  S_W <- sqrt(n1 * n0 * (n + 1) * 1/12)
+  # Estimativa da variância com correção para empates
+  S_W <- sqrt(n1 * n0 * 1/12 * ((n + 1) - sum(NTIES^3 - NTIES)/((n) * (n - 1))))
   
-  W_FRT <- (W - E_W)/S_W
+  est_teste_frt <- (W - E_W)/S_W
   
-  pvalor <- 2 - 2 * pnorm(W_FRT)
+  est_teste_frt_mc <- rep(0, mc)
+  for (i in 1:mc) {
+    zpermut <- sample(z)
+    W_permut <- sum(zpermut * posto_y)
+    
+    est_teste_frt_mc[i] <- (W_permut - E_W)/S_W
+    
+  }
   
-  return(pvalor)
+  pvalor_frt_mc <- mean(abs(est_teste_frt_mc) > abs(est_teste_frt))
+  
+  return(pvalor_frt_mc)
   
 }
 
@@ -171,7 +201,7 @@ c("FRT CLT" = pvalor_frt_clt,
     ##              FRT Estatística t           FRT Estatística t MC 
     ##                    0.004787524                    0.004410000 
     ## FRT Estatística t studentizada         FRT Estatística Wilcox 
-    ##                    0.007491987                    0.012163129
+    ##                    0.007280000                    0.010780000
 
 O *p-valor* do FRT utilizando a estatística *t*-studentizada, apesar de
 estar próximo dos demais, é mais conservador quanto a
@@ -219,6 +249,8 @@ n0 <- n - n1 # Qtd. controle
 y0 <- sort(rnorm(n), decreasing = TRUE) # Valores de y controle
 tau <- 0 # Efeito causal
 y1 <- y0 + tau # Valores de y tratamento
+z <- sample(c(0, 1), size = n, replace = T, prob = c(n0, n1)) # Simulando tratamentos
+y <- ifelse(z == 1, y1, y0) # Respostas
 
 # Qtd. de permutações n1 em n
 M <- factorial(n)/(factorial(n1)*factorial(n-n1))
@@ -229,8 +261,10 @@ Z <- data.table(t(gtools::combinations(n, n1)))
 # Identificador do registro
 ID <- data.table(id = seq_len(n))
 
-# Valor crítico (0.05)
-est_H0 <- qnorm(0.975)
+# FRT
+tau_est <- mean(y[z == 1]) - mean(y[z == 0])
+s2_est <- var(y)
+est_teste_frt <- tau_est/sqrt(n*s2_est/(n1*n0))
 
 # Teste FRT (diferença de médias)
 est_T <- apply(Z, 2, function(z) {
@@ -248,16 +282,12 @@ est_T <- apply(Z, 2, function(z) {
   # Vetor z_m completo
   z_m <- z_m[, z]
   
-  # Vetor y_m
-  y_m <- ifelse(z_m == 1, y1, y0)
-  
   # Efeito causal médio
-  tau <- mean(y_m[z_m == 1]) - mean(y_m[z_m == 0])
-  s2 = var(y_m)
-  
-  # FRT TCL
-  est_teste_frt <- tau/sqrt(n*s2/(n1*n0))
-  teste_frt <- est_teste_frt >= est_H0
+  tau <- mean(y[z_m == 1]) - mean(y[z_m == 0])
+
+  # FRT MC
+  est_teste_frt_mc <- tau/sqrt(n*s2_est/(n1*n0))
+  teste_frt <- abs(est_teste_frt_mc) > abs(est_teste_frt)
   
   return(teste_frt)
   
@@ -273,80 +303,57 @@ time_final <- Sys.time()
 time_final - time_init
 ```
 
-    ## Time difference of 29.13742 mins
+    ## Time difference of 28.37935 mins
 
-## *p-valores* aproximados para $R = 10^2, 10^3, 10^4$
+## *p-valores* aproximados
 
 ``` r
-R_valores <- c(10^2, 10^3, 10^4)
+# Valores de R para o MC
+R_valores <- seq(100, 100000, 100)
 
-p_R_lista <- list()
+# Valores de para cada R
+dt_p_FRT <- data.table()
 
+# FRT MC 
 for (R in R_valores) {
   
-  nome_lista <- paste0("R = ", R)
+  # Estatisticas MC
+  est_teste_frt_mc <- rep(0, R)
   
-  # Amostrando permutações
-  Z_R <- as.data.table(as_tibble(Z)[, c(sample(seq_len(M), size = R, replace = F))])
+  for (i in 1:R) {
+    zpermut <- sample(z)
+    tau_permut <- mean(y[zpermut == 1]) - mean(y[zpermut == 0])
+    est_teste_frt_mc[i] <- tau_permut/sqrt(n*s2_est/(n1*n0))
+    
+  }
   
-  # Teste FRT (diferença de médias)
-  est_T_R <- apply(Z_R, 2, function(z) {
-    
-    z_m <- Z_R[, .(z)]
-    
-    z_m[, id := z]
-    
-    z_m <- z_m[ID, on = .(id)]
-    z_m[, id := NULL]
-    
-    z_m[, z := ifelse(is.na(z), 0, 1)]
-    
-    z_m <- z_m[, z]
-    
-    y_m <- ifelse(z_m == 1, y1, y0)
-    
-    tau <- mean(y_m[z_m == 1]) - mean(y_m[z_m == 0])
-    s2 = var(y_m)
-    
-    est_teste_frt <- tau/sqrt(n*s2/(n1*n0))
-    
-    teste_frt <- est_teste_frt >= est_H0
-    
-    return(teste_frt)
-    
-  })
+  # Indicadora de T_MC > T_obs
+  T_est <- abs(est_teste_frt_mc) > abs(est_teste_frt)
   
-  p_hat_FRT <- mean(est_T_R)
+  # p_valor_hat
+  p_hat_FRT <- mean(T_est)
   
-  p_til_FRT <- sum(est_T_R)/(1+R)
+  # p_valor_til
+  p_til_FRT <- (1 + sum(T_est))/(1+R)
   
-  p_R_lista[[nome_lista]] <- c("p" = p_FRT,
-                               "p_hat" = p_hat_FRT,
-                               "p_til" = p_til_FRT)
+  # Salvando valores da iteração
+  dt_p_FRT_R <- data.table(R = R,
+                           p = p_FRT,
+                           p_hat = p_hat_FRT,
+                           p_til = p_til_FRT)
+  dt_p_FRT <- rbind(dt_p_FRT, dt_p_FRT_R)
+  
 }
 
-# R = 10^2
-p_R_lista[[1]]
+# Gráfico da convergência em R
+dt_p_FRT %>% 
+  pivot_longer(cols = c("p", "p_hat", "p_til"), names_to = "Estimativa", 
+               values_to = "p_valor") %>% 
+  ggplot() +
+  geom_line(aes(x = R, y = p_valor, color = Estimativa))
 ```
 
-    ##          p      p_hat      p_til 
-    ## 0.02415077 0.01000000 0.00990099
-
-``` r
-# R = 10^3
-p_R_lista[[2]]
-```
-
-    ##          p      p_hat      p_til 
-    ## 0.02415077 0.01900000 0.01898102
-
-``` r
-# R = 10^4
-p_R_lista[[3]]
-```
-
-    ##          p      p_hat      p_til 
-    ## 0.02415077 0.02570000 0.02569743
+![](Lista_2_files/figure-gfm/amostras_R-1.png)<!-- -->
 
 # Questão 6b
 
@@ -389,7 +396,7 @@ c("var_hat_tau" = var_hat_tau,
 ```
 
     ## var_hat_tau       V_til    V_til_MC 
-    ##  0.04603892  0.04053786  0.04545174
+    ##  0.04924418  0.05012765  0.04878292
 
 ``` r
 # Cobertura do valor real nos intervalos
@@ -400,7 +407,7 @@ for (i in 1:10^4) {
 mean(cobertura)
 ```
 
-    ## [1] 0.9454
+    ## [1] 0.9418
 
 ``` r
 hist(est)
@@ -408,13 +415,15 @@ hist(est)
 
 ![](Lista_2_files/figure-gfm/ilustracao-1.png)<!-- -->
 
+# Caso 1
+
 ``` r
 y0 <- sort(y0, decreasing = FALSE)
 var_hat_tau <- var(y1) / n1 + var(y0) / n0 - var(y1 - y0) / n
 var_hat_tau
 ```
 
-    ## [1] 0.00977355
+    ## [1] 0.009483101
 
 ``` r
 tau_hat_p <- c()
@@ -434,7 +443,7 @@ for (i in 1:10^4) {
 c(mean(V_til_p), mean(cobertura))
 ```
 
-    ## [1] 0.04563589 1.00000000
+    ## [1] 0.04894436 1.00000000
 
 ``` r
 hist(est)
@@ -442,13 +451,15 @@ hist(est)
 
 ![](Lista_2_files/figure-gfm/caso1-1.png)<!-- -->
 
+# Caso 2
+
 ``` r
 y0 <- sample(y0)
 var_hat_tau <- var(y1) / n1 + var(y0) / n0 - var(y1 - y0) / n
 var_hat_tau
 ```
 
-    ## [1] 0.0255929
+    ## [1] 0.02548106
 
 ``` r
 tau_hat_p <- c()
@@ -468,13 +479,15 @@ for (i in 1:10^4) {
 c(mean(V_til_p), mean(cobertura))
 ```
 
-    ## [1] 0.04590446 0.98710000
+    ## [1] 0.04904799 0.99180000
 
 ``` r
 hist(est)
 ```
 
 ![](Lista_2_files/figure-gfm/caso2-1.png)<!-- -->
+
+# Caso 3
 
 ``` r
 set.seed(123)
@@ -502,7 +515,7 @@ for (i in 1:10^4) {
 c(mean(V_til_p), mean(cobertura))
 ```
 
-    ## [1] 0.7914444 0.9970000
+    ## [1] 0.7987814 0.9960000
 
 ``` r
 hist(est)
