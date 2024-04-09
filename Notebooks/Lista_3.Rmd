@@ -337,7 +337,6 @@ k_levels <- unique(k) # Níveis dos extratos
 
 # Matriz de covariáveis
 x <- dados[, -c(1, 2, 10)]
-x <- scale(x)
 
 # Tamanho total
 n <- nrow(dados)
@@ -436,7 +435,7 @@ var_k <- rep(0, K)
   
 # Ajuste de regressação por extrato
 for (estrato in sort(k_levels)) {
-  x_k <- x[k == estrato, ]
+  x_k <- scale(x[k == estrato, ], scale = F)
   z_k <- z[k == estrato]
   y_k <- y[k == estrato]
   pi_k[estrato] <- length(z_k)/n
@@ -464,6 +463,6 @@ ic_rem <- c(lim_inf, lim_sup)
 # Intervalos de confiança 95% (conservador)
 list("FRT SRE" = ic_frt,
      "Neyman SRE" = ic_neyman,
-     "Lin SRE", ic_rem)
+     "Lin SRE" = ic_rem)
 ```
 
