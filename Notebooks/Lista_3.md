@@ -103,17 +103,18 @@ v_s_1mg <- sum(df_multicenter_1mg$pi_k^2 * df_multicenter_1mg$var_k)
 # IC 95% (conservador)
 lim_inf_1mg <- tau_s_1mg - 1.96*sqrt(v_s_1mg)
 lim_sup_1mg <- tau_s_1mg + 1.96*sqrt(v_s_1mg)
-c(lim_inf_1mg, lim_sup_1mg)
-```
 
-    ## [1] -1.468874  0.154194
-
-``` r
-# Teste bilateral
 est_s_1mg <- tau_s_1mg/sqrt(v_s_1mg)
-2 - 2 * pnorm(abs(est_s_1mg)) # p-valor
+
+# Teste bilateral
+list("Neyman IC" = c(lim_inf_1mg, lim_sup_1mg),
+     "Neyman p-valor" = 2 - 2 * pnorm(abs(est_s_1mg)))
 ```
 
+    ## $`Neyman IC`
+    ## [1] -1.468874  0.154194
+    ## 
+    ## $`Neyman p-valor`
     ## [1] 0.1123782
 
 ## Finasterida 5mg vs Controle
@@ -138,17 +139,18 @@ v_s_5mg <- sum(df_multicenter_5mg$pi_k^2 * df_multicenter_5mg$var_k)
 # IC 95% (conservador)
 lim_inf_5mg <- tau_s_5mg - 1.96*sqrt(v_s_5mg)
 lim_sup_5mg <- tau_s_5mg + 1.96*sqrt(v_s_5mg)
-c(lim_inf_5mg, lim_sup_5mg)
-```
 
-    ## [1] -2.4259519 -0.8555447
-
-``` r
 # Teste Bilateral
 est_s_5mg <- tau_s_5mg/sqrt(v_s_5mg)
-2 - 2 * pnorm(abs(est_s_5mg)) # p-valor
+
+list("Neyman IC" = c(lim_inf_5mg, lim_sup_5mg),
+     "Neyman p-valor" = 2 - 2 * pnorm(abs(est_s_5mg)))
 ```
 
+    ## $`Neyman IC`
+    ## [1] -2.4259519 -0.8555447
+    ## 
+    ## $`Neyman p-valor`
     ## [1] 4.211066e-05
 
 # Questão 3
@@ -335,67 +337,91 @@ ic_neyman_sre_x3 <- c(est_neyman_x3 - 1.96 * se_hat_x3, est_neyman_x3 + 1.96 * s
 
 ``` r
 # p-valores FRT
-c("FRT CRE" = pvalor_frt_clt,
-  "FRT CRE (MC)" = pvalor_frt_mc,
-  "FRT SRE" = pvalor_frt_sre_x1, 
-  "FRT SRE (MC)" = pvalor_frt_sre_x1_mc)
+list("FRT CRE" = pvalor_frt_clt,
+     "FRT CRE (MC)" = pvalor_frt_mc,
+     "FRT SRE (MC)" = pvalor_frt_sre_x1_mc)
 ```
 
-    ##      FRT CRE FRT CRE (MC)      FRT SRE FRT SRE (MC) 
-    ##   0.00490649   0.00480000   0.00000000   0.00420000
+    ## $`FRT CRE`
+    ## [1] 0.00490649
+    ## 
+    ## $`FRT CRE (MC)`
+    ## [1] 0.0048
+    ## 
+    ## $`FRT SRE (MC)`
+    ## [1] 0.0042
 
 ``` r
 # ICs 95% conservadores Neyman
-c("Neyman CRE" = ic_neyman_cre,
-  "Neyman SRE" = ic_neyman_sre_x1)
+list("Neyman CRE" = ic_neyman_cre,
+     "Neyman SRE" = ic_neyman_sre_x1)
 ```
 
-    ## Neyman CRE1 Neyman CRE2 Neyman SRE1 Neyman SRE2 
-    ##   -1312.479    1317.828   -1322.155    1327.466
+    ## $`Neyman CRE`
+    ## [1] -1312.479  1317.828
+    ## 
+    ## $`Neyman SRE`
+    ## [1] -1322.155  1327.466
 
 ### *marital status*
 
 ``` r
 # p-valores FRT
-c("FRT CRE" = pvalor_frt_clt,
-  "FRT CRE (MC)" = pvalor_frt_mc,
-  "FRT SRE" = pvalor_frt_sre_x2, 
-  "FRT SRE (MC)" = pvalor_frt_sre_x2_mc)
+list("FRT CRE" = pvalor_frt_clt,
+     "FRT CRE (MC)" = pvalor_frt_mc,
+     "FRT SRE (MC)" = pvalor_frt_sre_x2_mc)
 ```
 
-    ##      FRT CRE FRT CRE (MC)      FRT SRE FRT SRE (MC) 
-    ##   0.00490649   0.00480000   0.00000000   0.00570000
+    ## $`FRT CRE`
+    ## [1] 0.00490649
+    ## 
+    ## $`FRT CRE (MC)`
+    ## [1] 0.0048
+    ## 
+    ## $`FRT SRE (MC)`
+    ## [1] 0.0057
 
 ``` r
 # ICs 95% conservadores Neyman
-c("Neyman CRE" = ic_neyman_cre,
-  "Neyman SRE" = ic_neyman_sre_x2)
+list("Neyman CRE" = ic_neyman_cre,
+     "Neyman SRE" = ic_neyman_sre_x2)
 ```
 
-    ## Neyman CRE1 Neyman CRE2 Neyman SRE1 Neyman SRE2 
-    ##   -1312.479    1317.828   -1311.143    1316.416
+    ## $`Neyman CRE`
+    ## [1] -1312.479  1317.828
+    ## 
+    ## $`Neyman SRE`
+    ## [1] -1311.143  1316.416
 
 ### *high school diploma*
 
 ``` r
 # p-valores FRT
-c("FRT CRE" = pvalor_frt_clt,
-  "FRT CRE (MC)" = pvalor_frt_mc,
-  "FRT SRE" = pvalor_frt_sre_x3, 
-  "FRT SRE (MC)" = pvalor_frt_sre_x3_mc)
+list("FRT CRE" = pvalor_frt_clt,
+     "FRT CRE (MC)" = pvalor_frt_mc,
+     "FRT SRE (MC)" = pvalor_frt_sre_x3_mc)
 ```
 
-    ##      FRT CRE FRT CRE (MC)      FRT SRE FRT SRE (MC) 
-    ##   0.00490649   0.00480000   0.00000000   0.01150000
+    ## $`FRT CRE`
+    ## [1] 0.00490649
+    ## 
+    ## $`FRT CRE (MC)`
+    ## [1] 0.0048
+    ## 
+    ## $`FRT SRE (MC)`
+    ## [1] 0.0115
 
 ``` r
 # ICs 95% conservadores Neyman
-c("Neyman CRE" = ic_neyman_cre,
-  "Neyman SRE" = ic_neyman_sre_x3)
+list("Neyman CRE" = ic_neyman_cre,
+     "Neyman SRE" = ic_neyman_sre_x3)
 ```
 
-    ## Neyman CRE1 Neyman CRE2 Neyman SRE1 Neyman SRE2 
-    ##   -1312.479    1317.828   -1305.000    1309.792
+    ## $`Neyman CRE`
+    ## [1] -1312.479  1317.828
+    ## 
+    ## $`Neyman SRE`
+    ## [1] -1305.000  1309.792
 
 # Questão 6
 
@@ -540,14 +566,19 @@ ic_rem <- c(lim_inf, lim_sup)
 
 ``` r
 # Intervalos de confiança 95% (conservador)
-c("FRT SRE" = ic_frt,
-  "Neyman SRE" = ic_neyman,
-  "Lin SRE", ic_rem)
+list("FRT SRE" = ic_frt,
+     "Neyman SRE" = ic_neyman,
+     "Lin SRE", ic_rem)
 ```
 
-    ##              FRT SRE1              FRT SRE2           Neyman SRE1 
-    ##  "-0.150312355914601"  "-0.029500562087614"  "-0.150270048386589" 
-    ##           Neyman SRE2                                             
-    ## "-0.0295428696156272"             "Lin SRE"  "-0.149229466764887" 
-    ##                       
-    ## "-0.0312934900252242"
+    ## $`FRT SRE`
+    ## [1] -0.15031236 -0.02950056
+    ## 
+    ## $`Neyman SRE`
+    ## [1] -0.15027005 -0.02954287
+    ## 
+    ## [[3]]
+    ## [1] "Lin SRE"
+    ## 
+    ## [[4]]
+    ## [1] -0.14922947 -0.03129349

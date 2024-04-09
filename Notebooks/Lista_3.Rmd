@@ -56,11 +56,12 @@ v_s_1mg <- sum(df_multicenter_1mg$pi_k^2 * df_multicenter_1mg$var_k)
 # IC 95% (conservador)
 lim_inf_1mg <- tau_s_1mg - 1.96*sqrt(v_s_1mg)
 lim_sup_1mg <- tau_s_1mg + 1.96*sqrt(v_s_1mg)
-c(lim_inf_1mg, lim_sup_1mg)
+
+est_s_1mg <- tau_s_1mg/sqrt(v_s_1mg)
 
 # Teste bilateral
-est_s_1mg <- tau_s_1mg/sqrt(v_s_1mg)
-2 - 2 * pnorm(abs(est_s_1mg)) # p-valor
+list("Neyman IC" = c(lim_inf_1mg, lim_sup_1mg),
+     "Neyman p-valor" = 2 - 2 * pnorm(abs(est_s_1mg)))
 ```
 
 ## Finasterida 5mg vs Controle
@@ -85,11 +86,12 @@ v_s_5mg <- sum(df_multicenter_5mg$pi_k^2 * df_multicenter_5mg$var_k)
 # IC 95% (conservador)
 lim_inf_5mg <- tau_s_5mg - 1.96*sqrt(v_s_5mg)
 lim_sup_5mg <- tau_s_5mg + 1.96*sqrt(v_s_5mg)
-c(lim_inf_5mg, lim_sup_5mg)
 
 # Teste Bilateral
 est_s_5mg <- tau_s_5mg/sqrt(v_s_5mg)
-2 - 2 * pnorm(abs(est_s_5mg)) # p-valor
+
+list("Neyman IC" = c(lim_inf_5mg, lim_sup_5mg),
+     "Neyman p-valor" = 2 - 2 * pnorm(abs(est_s_5mg)))
 ```
 
 # Questão 3
@@ -276,48 +278,45 @@ ic_neyman_sre_x3 <- c(est_neyman_x3 - 1.96 * se_hat_x3, est_neyman_x3 + 1.96 * s
 
 ```{r q3_race_frt}
 # p-valores FRT
-c("FRT CRE" = pvalor_frt_clt,
-  "FRT CRE (MC)" = pvalor_frt_mc,
-  "FRT SRE" = pvalor_frt_sre_x1, 
-  "FRT SRE (MC)" = pvalor_frt_sre_x1_mc)
+list("FRT CRE" = pvalor_frt_clt,
+     "FRT CRE (MC)" = pvalor_frt_mc,
+     "FRT SRE (MC)" = pvalor_frt_sre_x1_mc)
 ```
 
 ```{r q3_race_neyman}
 # ICs 95% conservadores Neyman
-c("Neyman CRE" = ic_neyman_cre,
-  "Neyman SRE" = ic_neyman_sre_x1)
+list("Neyman CRE" = ic_neyman_cre,
+     "Neyman SRE" = ic_neyman_sre_x1)
 ```
 
 ### *marital status*
 
 ```{r q3_marital_frt}
 # p-valores FRT
-c("FRT CRE" = pvalor_frt_clt,
-  "FRT CRE (MC)" = pvalor_frt_mc,
-  "FRT SRE" = pvalor_frt_sre_x2, 
-  "FRT SRE (MC)" = pvalor_frt_sre_x2_mc)
+list("FRT CRE" = pvalor_frt_clt,
+     "FRT CRE (MC)" = pvalor_frt_mc,
+     "FRT SRE (MC)" = pvalor_frt_sre_x2_mc)
 ```
 
 ```{r q3_marital_neyman}
 # ICs 95% conservadores Neyman
-c("Neyman CRE" = ic_neyman_cre,
-  "Neyman SRE" = ic_neyman_sre_x2)
+list("Neyman CRE" = ic_neyman_cre,
+     "Neyman SRE" = ic_neyman_sre_x2)
 ```
 
 ### *high school diploma*
 
 ```{r q3_diploma_frt}
 # p-valores FRT
-c("FRT CRE" = pvalor_frt_clt,
-  "FRT CRE (MC)" = pvalor_frt_mc,
-  "FRT SRE" = pvalor_frt_sre_x3, 
-  "FRT SRE (MC)" = pvalor_frt_sre_x3_mc)
+list("FRT CRE" = pvalor_frt_clt,
+     "FRT CRE (MC)" = pvalor_frt_mc,
+     "FRT SRE (MC)" = pvalor_frt_sre_x3_mc)
 ```
 
 ```{r q3_diploma_neyman}
 # ICs 95% conservadores Neyman
-c("Neyman CRE" = ic_neyman_cre,
-  "Neyman SRE" = ic_neyman_sre_x3)
+list("Neyman CRE" = ic_neyman_cre,
+     "Neyman SRE" = ic_neyman_sre_x3)
 ```
 
 # Questão 6
@@ -463,8 +462,8 @@ ic_rem <- c(lim_inf, lim_sup)
 
 ```{r q6_resultados}
 # Intervalos de confiança 95% (conservador)
-c("FRT SRE" = ic_frt,
-  "Neyman SRE" = ic_neyman,
-  "Lin SRE", ic_rem)
+list("FRT SRE" = ic_frt,
+     "Neyman SRE" = ic_neyman,
+     "Lin SRE", ic_rem)
 ```
 
