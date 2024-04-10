@@ -278,8 +278,7 @@ tau_hat <- mean(y[z == 1]) - mean(y[z == 0])
 V_hat <- var(y[z == 1]) / n1 + var(y[z == 0]) / n0
 se_hat <- sqrt(V_hat)
 
-est_neyman_cre <- tau_hat/se_hat
-ic_neyman_cre <- c(est_neyman_cre - 1.96 * se_hat, est_neyman_cre + 1.96 * se_hat)
+ic_neyman_cre <- c(tau_hat - 1.96 * se_hat, tau_hat + 1.96 * se_hat)
 
 # SRE
 neyman_sre <- function(y, z, x) {
@@ -306,29 +305,29 @@ neyman_sre <- function(y, z, x) {
 # race
 est_x1 <- neyman_sre(y, z, x1)
 
+tau_hat_x1 <- est_x1[1] 
 se_hat_x1 <- sqrt(est_x1[2])
-est_neyman_x1 <- est_x1[1]/se_hat_x1
 
 # IC 95% (convervador)
-ic_neyman_sre_x1 <- c(est_neyman_x1 - 1.96 * se_hat_x1, est_neyman_x1 + 1.96 * se_hat_x1)
+ic_neyman_sre_x1 <- c(tau_hat_x1 - 1.96 * se_hat_x1, tau_hat_x1 + 1.96 * se_hat_x1)
 
 # married
 est_x2 <- neyman_sre(y, z, x2)
 
+tau_hat_x2 <- est_x2[1] 
 se_hat_x2 <- sqrt(est_x2[2])
-est_neyman_x2 <- est_x2[1]/se_hat_x2
 
 # IC 95% (convervador)
-ic_neyman_sre_x2 <- c(est_neyman_x2 - 1.96 * se_hat_x2, est_neyman_x2 + 1.96 * se_hat_x2)
+ic_neyman_sre_x2 <- c(tau_hat_x2 - 1.96 * se_hat_x2, tau_hat_x2 + 1.96 * se_hat_x2)
 
 # nodegr
 est_x3 <- neyman_sre(y, z, x3)
 
+tau_hat_x3 <- est_x3[1] 
 se_hat_x3 <- sqrt(est_x3[2])
-est_neyman_x3 <- est_x3[1]/se_hat_x3
 
 # IC 95% (convervador)
-ic_neyman_sre_x3 <- c(est_neyman_x3 - 1.96 * se_hat_x3, est_neyman_x3 + 1.96 * se_hat_x3)
+ic_neyman_sre_x3 <- c(tau_hat_x3 - 1.96 * se_hat_x3, tau_hat_x3 + 1.96 * se_hat_x3)
 ```
 
 ## Resultados
@@ -358,10 +357,10 @@ list("Neyman CRE" = ic_neyman_cre,
 ```
 
     ## $`Neyman CRE`
-    ## [1] -1312.479  1317.828
+    ## [1]  479.1895 3109.4967
     ## 
     ## $`Neyman SRE`
-    ## [1] -1322.155  1327.466
+    ## [1]  470.1587 3119.7794
 
 ### *marital status*
 
@@ -388,10 +387,10 @@ list("Neyman CRE" = ic_neyman_cre,
 ```
 
     ## $`Neyman CRE`
-    ## [1] -1312.479  1317.828
+    ## [1]  479.1895 3109.4967
     ## 
     ## $`Neyman SRE`
-    ## [1] -1311.143  1316.416
+    ## [1]  453.3955 3080.9549
 
 ### *high school diploma*
 
@@ -418,10 +417,10 @@ list("Neyman CRE" = ic_neyman_cre,
 ```
 
     ## $`Neyman CRE`
-    ## [1] -1312.479  1317.828
+    ## [1]  479.1895 3109.4967
     ## 
     ## $`Neyman SRE`
-    ## [1] -1305.000  1309.792
+    ## [1]  290.8856 2905.6768
 
 # Questão 6
 
@@ -441,7 +440,6 @@ k_levels <- unique(k) # Níveis dos extratos
 
 # Matriz de covariáveis
 x <- dados[, -c(1, 2, 10)]
-x <- scale(x)
 
 # Tamanho total
 n <- nrow(dados)
@@ -540,7 +538,7 @@ var_k <- rep(0, K)
   
 # Ajuste de regressação por extrato
 for (estrato in sort(k_levels)) {
-  x_k <- x[k == estrato, ]
+  x_k <- scale(x[k == estrato, ], scale = F)
   z_k <- z[k == estrato]
   y_k <- y[k == estrato]
   pi_k[estrato] <- length(z_k)/n
@@ -568,7 +566,7 @@ ic_rem <- c(lim_inf, lim_sup)
 # Intervalos de confiança 95% (conservador)
 list("FRT SRE" = ic_frt,
      "Neyman SRE" = ic_neyman,
-     "Lin SRE", ic_rem)
+     "Lin SRE" = ic_rem)
 ```
 
     ## $`FRT SRE`
@@ -577,8 +575,5 @@ list("FRT SRE" = ic_frt,
     ## $`Neyman SRE`
     ## [1] -0.15027005 -0.02954287
     ## 
-    ## [[3]]
-    ## [1] "Lin SRE"
-    ## 
-    ## [[4]]
-    ## [1] -0.14922947 -0.03129349
+    ## $`Lin SRE`
+    ## [1] -0.14509019 -0.03032231
