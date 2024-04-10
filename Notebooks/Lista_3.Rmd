@@ -219,8 +219,7 @@ tau_hat <- mean(y[z == 1]) - mean(y[z == 0])
 V_hat <- var(y[z == 1]) / n1 + var(y[z == 0]) / n0
 se_hat <- sqrt(V_hat)
 
-est_neyman_cre <- tau_hat/se_hat
-ic_neyman_cre <- c(est_neyman_cre - 1.96 * se_hat, est_neyman_cre + 1.96 * se_hat)
+ic_neyman_cre <- c(tau_hat - 1.96 * se_hat, tau_hat + 1.96 * se_hat)
 
 # SRE
 neyman_sre <- function(y, z, x) {
@@ -247,29 +246,29 @@ neyman_sre <- function(y, z, x) {
 # race
 est_x1 <- neyman_sre(y, z, x1)
 
+tau_hat_x1 <- est_x1[1] 
 se_hat_x1 <- sqrt(est_x1[2])
-est_neyman_x1 <- est_x1[1]/se_hat_x1
 
 # IC 95% (convervador)
-ic_neyman_sre_x1 <- c(est_neyman_x1 - 1.96 * se_hat_x1, est_neyman_x1 + 1.96 * se_hat_x1)
+ic_neyman_sre_x1 <- c(tau_hat_x1 - 1.96 * se_hat_x1, tau_hat_x1 + 1.96 * se_hat_x1)
 
 # married
 est_x2 <- neyman_sre(y, z, x2)
 
+tau_hat_x2 <- est_x2[1] 
 se_hat_x2 <- sqrt(est_x2[2])
-est_neyman_x2 <- est_x2[1]/se_hat_x2
 
 # IC 95% (convervador)
-ic_neyman_sre_x2 <- c(est_neyman_x2 - 1.96 * se_hat_x2, est_neyman_x2 + 1.96 * se_hat_x2)
+ic_neyman_sre_x2 <- c(tau_hat_x2 - 1.96 * se_hat_x2, tau_hat_x2 + 1.96 * se_hat_x2)
 
 # nodegr
 est_x3 <- neyman_sre(y, z, x3)
 
+tau_hat_x3 <- est_x3[1] 
 se_hat_x3 <- sqrt(est_x3[2])
-est_neyman_x3 <- est_x3[1]/se_hat_x3
 
 # IC 95% (convervador)
-ic_neyman_sre_x3 <- c(est_neyman_x3 - 1.96 * se_hat_x3, est_neyman_x3 + 1.96 * se_hat_x3)
+ic_neyman_sre_x3 <- c(tau_hat_x3 - 1.96 * se_hat_x3, tau_hat_x3 + 1.96 * se_hat_x3)
 ```
 
 ## Resultados
