@@ -1,20 +1,45 @@
----
-title: "MI628 - Lista 1"
-output: github_document
----
+Ding, P. (2023) 1.5 Homework Problems
+================
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-set.seed(123)
-```
+Homework problems from [Ding, P. (2023)](#1), Chapter 1: Correlation,
+Assossiation, and the Yule-Simpson Paradox.
 
 # Pacotes e Funções
 
-```{r utils, warning=FALSE}
+``` r
 # PACOTES
 library(Matching)
-library(tidyverse)
+```
 
+    ## Carregando pacotes exigidos: MASS
+
+    ## ## 
+    ## ##  Matching (Version 4.10-14, Build Date: 2023-09-13)
+    ## ##  See https://www.jsekhon.com for additional documentation.
+    ## ##  Please cite software as:
+    ## ##   Jasjeet S. Sekhon. 2011. ``Multivariate and Propensity Score Matching
+    ## ##   Software with Automated Balance Optimization: The Matching package for R.''
+    ## ##   Journal of Statistical Software, 42(7): 1-52. 
+    ## ##
+
+``` r
+library(tidyverse)
+```
+
+    ## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+    ## ✔ dplyr     1.1.4     ✔ readr     2.1.5
+    ## ✔ forcats   1.0.0     ✔ stringr   1.5.1
+    ## ✔ ggplot2   3.5.0     ✔ tibble    3.2.1
+    ## ✔ lubridate 1.9.3     ✔ tidyr     1.3.1
+    ## ✔ purrr     1.0.2
+
+    ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+    ## ✖ dplyr::filter() masks stats::filter()
+    ## ✖ dplyr::lag()    masks stats::lag()
+    ## ✖ dplyr::select() masks MASS::select()
+    ## ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+
+``` r
 # FUNCOES
 # Função que ajusta modelos para todas as combinações de preditoras
 # possíveis
@@ -93,9 +118,13 @@ extraindo.pvalor <- function(ajustes) {
 }
 ```
 
+# Questão 1
+
+## a) $Z \perp \!\!\! \perp Y$, $RD = 0$, $RR = 1$ e $OD = 1$ são equivalentes
+
 # Questão 3
 
-```{r base}
+``` r
 # Carregando base
 data(lalonde)
 
@@ -104,7 +133,7 @@ lalonde <- lalonde %>%
   mutate(treat = factor(treat))
 ```
 
-```{r ajustes}
+``` r
 # Ajustando 1024 regressões
 ajustes <- ajuste.subconjuntos(lalonde)
 
@@ -121,12 +150,30 @@ resultados <- tibble(betas, pvalores) %>%
          sig = ifelse(pvalores <= 2.807034, 1, 0))
 ```
 
-a) Quantidade de vezes em que o tratamento foi positivo e significativo: `r sum(resultados$pos_sig)`
-b) Quantidade de vezes em que o tratamento foi negativo e significativo: `r sum(resultados$neg_sig)`
-c) Quantidade de vezes em que o tratamento não foi significativo: `r sum(resultados$sig)`
+1)  Quantidade de vezes em que o tratamento foi positivo e
+    significativo: 106
+2)  Quantidade de vezes em que o tratamento foi negativo e
+    significativo: 0
+3)  Quantidade de vezes em que o tratamento não foi significativo: 918
 
-```{r ajustes_correcao}
+``` r
 library(car)
+```
+
+    ## Carregando pacotes exigidos: carData
+
+    ## 
+    ## Attaching package: 'car'
+
+    ## The following object is masked from 'package:dplyr':
+    ## 
+    ##     recode
+
+    ## The following object is masked from 'package:purrr':
+    ## 
+    ##     some
+
+``` r
 library(purrr)
 
 se_EHW <- map(ajustes, function(x) sqrt(hccm(x, type = "hc0")[2, 2]))
@@ -137,10 +184,11 @@ n_signficativos <- as.numeric(unlist(map(Z, function(x) ifelse(x > 2.807034, 1, 
 sum(n_signficativos)
 ```
 
+    ## [1] 1
 
 # Questão 4a
 
-```{r esperanca}
+``` r
 E_rho_pos <- -0.5 - 2 * ((-dnorm(0.5))/(1 - pnorm(0.5, lower.tail = T)))
 
 E_rho_neg <- - 1 * (dnorm(0.5)/(pnorm(0.5)))
@@ -150,9 +198,11 @@ E_diff <- E_rho_pos - E_rho_neg
 E_diff
 ```
 
+    ## [1] 2.291316
+
 # Questão 4b
 
-```{r sim1}
+``` r
 Y0 <- rnorm(1)
 tau <- -0.5 + Y0
 Y1 <- Y0 + tau
@@ -162,7 +212,9 @@ Y <- Z * Y1 + (1-Z) * Y0
 Y
 ```
 
-```{r sim2}
+    ## [1] -1.111354
+
+``` r
 Y0 <- rnorm(1000000)
 tau <- -0.5 + Y0
 Y1 <- Y0 + tau
@@ -170,6 +222,23 @@ Z <- ifelse(tau < 0, 0, 1)
 Y <- Z * Y1 + (1-Z) * Y0
 
 mean(Y[Z==1])
+```
+
+    ## [1] 1.780816
+
+``` r
 mean(Y[Z==0])
+```
+
+    ## [1] -0.5085276
+
+``` r
 mean(Y[Z==1]) - mean(Y[Z==0])
 ```
+
+    ## [1] 2.289344
+
+## References
+
+\[1\] <a id="1">Ding, P. (2023)</a>. **A First Course in Causal
+Inference**, Chapman and Hall/CRC. (<https://arxiv.org/abs/2305.18793>)
