@@ -40,7 +40,7 @@ aggregated data has counts
 |     $Z = 1$      |   30    |   20    |
 |     $Z = 0$      |   40    |   10    |
 
-$$\widehat{RD} = \frac{30}{50} - \frac{40}{50} = 60\% - 80\% = -20\%$$.
+$$\hat{RD} = \frac{30}{50} - \frac{40}{50} = 60\% - 80\% = -20\%$$.
 
 The two two-by-two table based on the subgroup with $X = 1$ has counts
 
@@ -49,7 +49,7 @@ The two two-by-two table based on the subgroup with $X = 1$ has counts
 |        $Z = 1$        |   18    |   11    |
 |        $Z = 0$        |   12    |    9    |
 
-$$\widehat{RD}_{X=1} = \frac{18}{29} - \frac{12}{21} \approx 62\% - 57\% = 5\%$$.
+$$\hat{RD}_{X=1} = \frac{18}{29} - \frac{12}{21} \approx 62\% - 57\% = 5\%$$.
 For the subgroup with $X = 0$, the two two-by-two table has counts
 
 | subpopulation $X = 0$ | $Y = 1$ | $Y = 0$ |
@@ -57,11 +57,11 @@ For the subgroup with $X = 0$, the two two-by-two table has counts
 |        $Z = 1$        |   20    |   12    |
 |        $Z = 0$        |   10    |    8    |
 
-$$\widehat{RD}_{X=0} = \frac{20}{32} - \frac{10}{18} \approx 62\% - 56\% = 6\%$$.
+$$\hat{RD}_{X=0} = \frac{20}{32} - \frac{10}{18} \approx 62\% - 56\% = 6\%$$.
 
 That leads to
 
-$$\widehat{RD} < 0, \; \widehat{RD}_{X=1}>0, \; \widehat{RD}_{X=0} > 0$$
+$$\hat{RD} < 0, \; \hat{RD}_{X=1}>0, \; \hat{RD}_{X=0} > 0$$
 
 A real-life example of Simpson’s paradox is discussed in [Wang, Z.,
 Rousseau, R. (2021)](#2), where the infection fatality rate of COVID-19
