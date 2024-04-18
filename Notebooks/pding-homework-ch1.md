@@ -59,8 +59,7 @@ For the subgroup with $X = 0$, the two two-by-two table has counts
 
 $$\widehat{RD}_{X=0} = \frac{20}{32} - \frac{10}{18} \approx 62\% - 56\% = 6\%$$
 
-That leads to $\widehat{RD} < 0$, $\widehat{RD}_{X=1}>0$,
-$\widehat{RD}_{X=0} > 0$
+That leads to $\widehat{RD} < 0$, $\widehat{RD} > 0$, $\widehat{RD} > 0$
 
 A real-life example of Simpson’s paradox is discussed in [Wang, Z.,
 Rousseau, R. (2021)](#2), where the infection fatality rate of COVID-19
