@@ -8,15 +8,17 @@ Assossiation, and the Yule-Simpson Paradox.
 
 Prove (1) and (2) in Proposition 1.1.
 
-1)  The following statements are equivalent: $Z \perp \!\!\! \perp Y$,
-    $RD = 0$, $RR = 1$ and $OR = 1$.
+**Solution**
+
+1)  The following statements are equivalent: $Z \perp Y$, $RD = 0$,
+    $RR = 1$ and $OR = 1$.
 
 $$Z \perp \!\!\! \perp Y \Rightarrow \textrm{pr}(Y|Z) = \textrm{pr}(Y)$$
-$$RD = pr(Y = 1 | Z = 1) - pr(Y = 1 |Z = 0) \overset{Z \perp \!\!\! \perp Y}{=} pr(Y = 1) - pr(Y = 1) = 0$$
+$$RD = pr(Y = 1 | Z = 1) - pr(Y = 1 |Z = 0) = pr(Y = 1) - pr(Y = 1) = 0$$
 
-$$RR = \frac{pr(Y = 1 | Z = 1)}{pr(Y = 1 |Z = 0)} \overset{Z \perp \!\!\! \perp Y}{=} = \frac{pr(Y = 1)}{pr(Y = 1) = 1}$$
+$$RR = \frac{pr(Y = 1 | Z = 1)}{pr(Y = 1 |Z = 0)} = \frac{pr(Y = 1)}{pr(Y = 1) = 1}$$
 
-$$OR = \frac{\frac{pr(Y = 1 | Z = 1)}{pr(Y = 1 |Z = 0)}}{\frac{pr(Y = 0 | Z = 1)}{pr(Y = 0 |Z = 0)}} \overset{Z \perp \!\!\! \perp Y}{=} \frac{\frac{pr(Y = 1)}{pr(Y = 1)}}{\frac{pr(Y = 0)}{pr(Y = 0)}} = 1$$
+$$OR = \frac{\frac{pr(Y = 1 | Z = 1)}{pr(Y = 1 |Z = 0)}}{\frac{pr(Y = 0 | Z = 1)}{pr(Y = 0 |Z = 0)}} = \frac{\frac{pr(Y = 1)}{pr(Y = 1)}}{\frac{pr(Y = 0)}{pr(Y = 0)}} = 1$$
 
 2)  If $p_{zy}$’s are all positive, then $RD > 0$ is equivalent to
     $RR > 1$ and is also equivalent to $OR > 1$
@@ -31,6 +33,8 @@ $$OR = \frac{pr(Y = 1 | Z = 1)}{pr(Y = 1 |Z = 0)} \cdot \frac{pr(Y = 0 | Z = 0)}
 Give a numeric example of a two-by-two-by-two table in which the Yule–
 Simpson Paradox arises. Find a real-life example in which the
 Yule–Simpson Paradox arises
+
+**Solution**
 
 For a numeric example, assume that the two-by-two table based on the
 aggregated data has counts
@@ -64,6 +68,27 @@ in men versus women is debated. In summary, the analysis of aggregated
 data pointed to a higher infection fatality rate for women. However,
 when evaluated by age group, the fatality rate was higher for men across
 all age groups.
+
+### *1.3 Correlation and partial correlation*
+
+Consider a three-dimensional Normal random vector:
+
+$$\begin{pmatrix}X\\ Y\\ Z\end{pmatrix} \sim N\begin{pmatrix}\begin{pmatrix}0\\ 0\\ 0\end{pmatrix},\begin{pmatrix}1 &\rho_{XY} & \rho_{XZ}\\ \rho_{XY} &  1& \rho_{YZ}\\ \rho_{XZ} & \rho_{YZ} & 1\end{pmatrix}\end{pmatrix}$$
+The correlation coefficient between Y and Z is ρY Z. There are many
+equivalent definitions of the partial correlation coefficient. For a
+multivariate Normal vector, let ρY Z\|X denote the partial correlation
+coefficient between Y and Z given X, which is defined as their
+correlation coefficient in the conditional distribution (Y, Z) \| X.
+Show that
+
+$$\rho_{YZ|X} = \frac{\rho_{YZ} - \rho_{YX}\rho_{ZX}}{\sqrt{(1-\rho^{2}_{YX})(1-\rho^{2}_{ZX})}}$$
+Give a numerical example with $\rho_{YZ} > 0$ and $\rho_{YZ|X} < 0$.
+
+Remark: This is the Yule–Simpson Paradox for a Normal random vector. You
+can use the results in Chapter A.1.2 to prove the formula for the
+partial correlation coefficient.
+
+**Solution**
 
 ### References
 
